@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { bookSlot, getSlots } from '../service/api'
-import { DatePicker, Space } from 'antd';
 import './style.css'
 import { Modal, TextField, MenuItem, Button, Grid } from '@material-ui/core';
 
@@ -31,7 +30,6 @@ function HomePage() {
       });
   }
 
-  const { RangePicker } = DatePicker;
   const onChange = (value, dateString) => {
     // console.log('Selected Time: ', value);
     // console.log('Formatted Selected Time: ', dateString);
