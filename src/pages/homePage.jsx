@@ -2,9 +2,50 @@ import React, { useState, useEffect } from 'react'
 import { bookSlot, getSlots } from '../service/api'
 import './style.css'
 import { Modal, TextField, MenuItem, Button, Grid } from '@material-ui/core';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+const Toast = ({ type, message, onClose }) => {
+  let bgColor = '';
+  let textColor = '';
+
+  if (type === 'error') {
+    bgColor = 'bg-red-600';
+    textColor = 'text-white';
+  } else if (type === 'success') {
+    bgColor = 'bg-green-500';
+    textColor = 'text-white';
+  }
+
+  return (
+    <div style={{zIndex:1001}} className={`absolute top-0 right-0 mt-10 mr-2 py-2 px-4 rounded-md shadow-md ${bgColor} ${textColor}`}>
+      <p>{message}</p> 
+    </div>
+  );
+};
+
 
 function HomePage() {
   const [slots, setSlots] = useState([]);
+  const [showToast, setShowToast] = useState(null);
+
+  const {loggedIn} = useSelector(state => state.user)
+  const navigate = useNavigate()
+  useEffect(() => {
+    if(!loggedIn)
+    {
+      navigate('/login')
+    }
+  }, [loggedIn])
+  
+
+  const handleShowToast = (type, message) => {
+    setShowToast({ type, message });
+    setTimeout(() => {
+      setShowToast(null);
+    }, 3000);
+  };
+
 
   const getSlotsFun = (start, end) => {
     const obj = {}
@@ -82,7 +123,7 @@ function HomePage() {
     console.log("formData", formDataObj);
 
     if (!formDataObj.vehicleType || !formDataObj.dateOfParking || !formDataObj.endDateOfParking || !formDataObj.vehicleNo || !formDataObj.slotNumber) {
-      console.log('Error: Please fill in all fields'); // Update with your own error handling logic
+      handleShowToast('error','Please fill all the fields' )
       return;
     }
 
@@ -101,9 +142,14 @@ function HomePage() {
           setSlotNumber('');
           handleClose();
           getSlotsFun()
+          handleShowToast('success',res?.message )
+        }
+        else {
+          handleShowToast('error',res?.message )
         }
       })
       .catch(err => {
+        handleShowToast('error', err?.response?.data?.message?.details ? err?.response?.data?.message?.details[0]?.message : err?.response?.data?.message)
         console.log('Error:', err); // Update with your own error handling logic
       })
       .finally(() => {
@@ -142,10 +188,15 @@ function HomePage() {
     setIsOpen(false);
   };
 
+
+  
   return (
     <>
+      {showToast && (
+        <Toast type={showToast.type} message={showToast.message} onClose={() => setShowToast(null)} />
+      )}
       <div class="h-screen flex flex-col justify-center items-center mt-20">
-        <div className="flex justify-center items-center h-full mt-10">
+        {/* <div className="flex justify-center items-center h-full mt-10">
           <div className="w-96">
             <TextField
               label="Select date"
@@ -160,7 +211,7 @@ function HomePage() {
               inputProps={{ placeholder: 'dd/mm/yyyy hh:mm' }}
             />
           </div>
-        </div>
+        </div> */}
 
         <div style={{ padding: '10px', margin: '10px', marginTop: '50px' }}>
           <img src="https://cdn.reliance-foundry.com/media/20220610214611/parking-lot-spaces.jpg" alt="Parking Lot" className="w-full h-full object-cover" />
@@ -196,7 +247,16 @@ function HomePage() {
               {slots.map(slot => (
                 <>
                   {slot?.slotNumber > 26 && slot?.slotNumber <= 26 + 32 && (
-                    <li key={slot.slotNumber} className="flex p-1 items-center mb-2">
+                    <li onClick={() => {
+                      if (slot?.booked) {
+                        setupdateModalData(slot)
+                        setIsOpen(true)
+                      }
+                      else {
+                        setSlotNumber(slot?.slotNumber)
+                        setOpen(true)
+                      }
+                    }}  key={slot.slotNumber} className="flex p-1 items-center mb-2">
                       <span
                         className={`w-3 h-3 rounded-full mr-2 ${slot.booked ? "bg-green-500" : "bg-red-500"
                           }`}
@@ -216,12 +276,21 @@ function HomePage() {
               {slots.map(slot => (
                 <>
                   {slot?.slotNumber > 26 + 32 && slot?.slotNumber <= 26 + 32 + 22 && (
-                    <li key={slot.slotNumber} className="flex items-center mb-2">
+                    <li onClick={() => {
+                      if (slot?.booked) {
+                        setupdateModalData(slot)
+                        setIsOpen(true)
+                      }
+                      else {
+                        setSlotNumber(slot?.slotNumber)
+                        setOpen(true)
+                      }
+                    }}  key={slot.slotNumber} className="flex items-center mb-2">
                       <span
                         className={`w-3 h-3 rounded-full mr-2 ${slot.booked ? "bg-green-500" : "bg-red-500"
                           }`}
                       />
-                      {slot.slotNumber}
+                       
                     </li>
                   )}
                 </>
@@ -233,12 +302,23 @@ function HomePage() {
               {slots.map(slot => (
                 <>
                   {slot?.slotNumber > 26 + 32 + 22 && slot?.slotNumber <= 26 + 32 + 22 + 20 && (
-                    <li key={slot.slotNumber} className="flex items-center mb-2">
+                    <li 
+                    onClick={() => {
+                      if (slot?.booked) {
+                        setupdateModalData(slot)
+                        setIsOpen(true)
+                      }
+                      else {
+                        setSlotNumber(slot?.slotNumber)
+                        setOpen(true)
+                      }
+                    }} 
+                     key={slot.slotNumber} className="flex items-center mb-2">
                       <span
                         className={`w-3 h-3 rounded-full mr-2 ${slot.booked ? "bg-green-500" : "bg-red-500"
                           }`}
                       />
-                      {slot.slotNumber}
+                      
                     </li>
                   )}
                 </>
@@ -252,7 +332,7 @@ function HomePage() {
         open={open}
         onClose={handleClose}
         className="flex justify-center items-center"
-        style={{ width: window.innerWidth < 767 ? '80vw' : '50vw', maxWidth: '700px', margin: 'auto' }}
+        style={{ width: window.innerWidth < 767 ? '80vw' : '50vw', maxWidth: '700px', margin: 'auto',marginTop: '10vh' }}
       >
         <div className="w-full bg-white border border-gray-300 rounded-lg p-8 max-w-md">
           <h1 className="text-2xl font-semibold mb-6">Add Parking Details</h1>

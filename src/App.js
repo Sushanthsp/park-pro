@@ -7,10 +7,10 @@ import {
 } from "react-router-dom";
 import HomePage from "./pages/homePage";
 import Login from "./pages/login";
-
+ 
 function App() {
   return (
-    <Provider store={store}>
+     <Provider store={store}>
       <div className="App">
        
             <Router>
@@ -22,7 +22,7 @@ function App() {
          
       </div>
     </Provider>
-  );
+   );
 }
 
 export default App;
