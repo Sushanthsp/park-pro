@@ -214,8 +214,8 @@ function HomePage() {
       {showToast && (
         <Toast type={showToast.type} message={showToast.message} onClose={() => setShowToast(null)} />
       )}
-      <div class="h-screen flex flex-col justify-center items-center mt-10">
-        {/* <div className="flex justify-center items-center h-full mt-10">
+      <div class="h-screen flex flex-col justify-center items-center mt-2">
+        <div className="flex justify-center items-center h-full mt-10">
           <div className="w-96">
             <TextField
               label="Select date"
@@ -230,7 +230,16 @@ function HomePage() {
               inputProps={{ placeholder: 'dd/mm/yyyy hh:mm' }}
             />
           </div>
-        </div> */}
+          <Button variant="outlined" color="primary" className="border-primary text-primary hover:bg-primary hover:text-primary" 
+          style={{
+            marginLeft:'10px'
+          }}>
+
+            Clear
+          </Button>
+        </div>
+
+
         <div className="parking-lot-container w-90 h-90">
           <div className='relative'>
             <img
