@@ -129,6 +129,7 @@ export default function Login() {
                             </label>
                             <input
                                 type="number"
+                                value={input?.number}
                                 onChange={onChange}
                                 name="number"
                                 className="block w-full px-4 py-2 mt-2 text-black-700 bg-white border rounded-md focus:border-black-400 focus:ring-black-300 focus:outline-none focus:ring focus:ring-opacity-40"
@@ -140,6 +141,7 @@ export default function Login() {
                             </label>
                             <input
                                 type="password"
+                                value={input?.password}
                                 onChange={onChange}
                                 name="password"
                                 className="block w-full px-4 py-2 mt-2 text-black-700 bg-white border rounded-md focus:border-black-400 focus:ring-black-300 focus:outline-none focus:ring focus:ring-opacity-40"
@@ -170,8 +172,7 @@ export default function Login() {
                         Don't have an account?{" "}
                         <a
                             onClick={() => {
-                                setInput({ ...input, name: "", number: null, password: "" });
-                                setActiveTab(tabs.SIGNUP);
+                                 setActiveTab(tabs.SIGNUP);
                             }}
                             className="font-medium text-indigo-600 hover:underline cursor-pointer"
                         >
@@ -191,6 +192,7 @@ export default function Login() {
                             </label>
                             <input
                                 type="text"
+                                value={input?.name}
                                 onChange={onChange}
                                 name="name"
                                 className="block w-full px-4 py-2 mt-2 text-black-700 bg-white border rounded-md focus:border-black-400 focus:ring-black-300 focus:outline-none focus:ring focus:ring-opacity-40"
@@ -203,6 +205,7 @@ export default function Login() {
                             </label>
                             <input
                                 type="number"
+                                value={input?.number}
                                 onChange={onChange}
                                 name="number"
                                 className="block w-full px-4 py-2 mt-2 text-black-700 bg-white border rounded-md focus:border-black-400 focus:ring-black-300 focus:outline-none focus:ring focus:ring-opacity-40"
@@ -214,6 +217,7 @@ export default function Login() {
                             </label>
                             <input
                                 type="password"
+                                value={input?.password}
                                 onChange={onChange}
                                 name="password"
                                 className="block w-full px-4 py-2 mt-2 text-black-700 bg-white border rounded-md focus:border-black-400 focus:ring-black-300 focus:outline-none focus:ring focus:ring-opacity-40"
@@ -243,8 +247,7 @@ export default function Login() {
                         Already have an account?{" "}
                         <a
                             onClick={() => {
-                                setInput({ ...input, number: null, password: "" });
-                                setActiveTab(tabs.LOGIN);
+                                 setActiveTab(tabs.LOGIN);
                             }}
                             className="font-medium text-indigo-600 hover:underline cursor-pointer"
                         >

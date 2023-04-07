@@ -4,3 +4,22 @@
     border-color: #ff0000;  
     /* Add other custom styles here */
   }
+
+  .element {
+    border-style: none;
+    box-shadow: 
+    0 15px 0 0 rgb(229, 231, 233), /* Top border - 15px light blue */
+    0 -15px 0 0 rgb(229, 231, 233), /* Bottom border - 15px light blue */
+    0 0 0 2px rgb(8, 104, 230), /* First horizontal border - 2px dark blue */
+    0 0 0 30px rgb(229, 231, 233), /* Second horizontal border - 30px light blue */
+    0 0 0 32px rgb(8, 104, 230); /* Third horizontal border - 2px dark blue */
+  }
+
+  @media (max-width: 620px) {
+    .element {
+      border-style: solid;
+      border-width: 1px;
+      border-color: indigo;
+      box-shadow: none;
+    }
+  }

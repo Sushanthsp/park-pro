@@ -4,6 +4,8 @@ import './style.css'
 import { Modal, TextField, MenuItem, Button, Grid } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker'
+import "react-datepicker/dist/react-datepicker.css";
 
 const Toast = ({ type, message, onClose }) => {
   let bgColor = '';
@@ -210,341 +212,693 @@ function HomePage() {
   function getTimePeriodDifference(startTimePeriod, endTimePeriod) {
     // Calculate the time period difference in milliseconds
     const timePeriodDifferenceMs = new Date(endTimePeriod) - new Date(startTimePeriod);
-    console.log("timePeriodDifferenceMs",timePeriodDifferenceMs,startTimePeriod, endTimePeriod)
+    console.log("timePeriodDifferenceMs", timePeriodDifferenceMs, startTimePeriod, endTimePeriod)
     // Convert time period difference from milliseconds to hours and minutes
     const timePeriodDifferenceHrs = Math.floor(timePeriodDifferenceMs / (1000 * 60 * 60));
     const timePeriodDifferenceMin = Math.floor((timePeriodDifferenceMs % (1000 * 60 * 60)) / (1000 * 60));
-  
+
     // Format time period difference as hh:mm
     const formattedTimePeriodDifference = `${timePeriodDifferenceHrs.toString().padStart(2, '0')}:${timePeriodDifferenceMin.toString().padStart(2, '0')}`;
-  
+
     return formattedTimePeriodDifference;
   }
-  
-  
+
+  const [datepickerVisible, setDatePickerVisible] = useState(false); // State to control datepicker visibility
+
+  const handleDatepickerClick = () => {
+    setDatePickerVisible(!datepickerVisible); // Toggle datepicker visibility on click
+  }
+
   return (
     <>
       {showToast && (
         <Toast type={showToast.type} message={showToast.message} onClose={() => setShowToast(null)} />
       )}
-      <div class="h-screen flex flex-col justify-center items-center mt-2">
-        <div className="flex justify-center items-center h-full mt-10">
-          <div className="w-96">
-            <TextField
-              label="Select date"
-              type="datetime-local"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              fullWidth
-              variant="outlined"
-              className="mb-4"
-              margin="normal"
-              InputLabelProps={{ shrink: true }}
-              inputProps={{ placeholder: 'dd/mm/yyyy hh:mm' }}
+      <div class="sm:h-screen h:5 flex flex-col sm:justify-center sm:items-center mt-2">
+        <div className="flex sm:justify-center sm:items-center sm:h-full h-20 ">
+          <div class="w-full md:w-96 flex justify-center items-center mb-2 md:mb-0 md:mr-4">
+            <DatePicker
+              selected={startDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                setStartDate(start);
+                setEndDate(end);
+              }}
+              startDate={startDate}
+              endDate={endDate}
+              selectsRange
+              className="w-full border border-indigo-500 px-4 py-2 rounded-lg focus:outline-none focus:border-indigo-700"
+              placeholderText="Select Date Range"
             />
-          </div>
-          <Button variant="outlined" color="primary" className="border-primary text-primary hover:bg-primary hover:text-primary" 
-          style={{
-            marginLeft:'10px'
-          }}>
+            <Button onClick={() => {
+              setStartDate(null)
+              setEndDate(null)
+              getSlotsFun()
+            }} variant="outlined" color="primary" className="border-primary text-primary hover:bg-primary hover:text-primary max-h-10"
+              style={{
+                marginLeft: '10px'
+              }}>
 
-            Clear
-          </Button>
+              Clear
+            </Button>
+          </div>
+
         </div>
 
 
-        <div className="parking-lot-container w-90 h-90">
+        <div className="parking-lot-container w-90 h-90 element mt-5">
           <div className='relative'>
-            <img
+            {window?.innerWidth > 620 ? <img
               src="https://cdn.reliance-foundry.com/media/20220610214611/parking-lot-spaces.jpg"
               alt="Parking Lot"
               className="object-contain md:object-cover m-auto w-full h-full"
-            />
-            <div className="flex w-full flex-wrap " style={{ position: 'absolute', top: 0 }}>
+            /> :
+              <div className="flex flex-wrap">
 
-              <div className="flex " style={{
-                marginTop: '75px',
-                width: '60vw',
-                marginLeft: 'auto'
+                <img
+                  src={require('../assets/img1.png')}
+                  alt="Parking Lot"
+                  className="object-cover m-auto h-full w-100vw"
+                />
 
+                <img
+                  src={require('../assets/img2.png')}
+                  alt="Parking Lot"
+                  className="object-cover m-auto h-full w-90vw"
+                  style={{width:'90vw'}}
+                />
+              </div>
+            }
+
+
+            {window?.innerWidth > 620 ?
+              <div className="flex w-full flex-wrap " style={{ position: 'absolute', top: 0 }}>
+
+                <div className="flex" style={{
+                  marginTop: window.innerWidth > 1067 ? '75px' : window.innerWidth > 850 ? '75px' : '55px',
+                  width: window.innerWidth > 1067 ? '60vw' : window.innerWidth > 850 ? '74vw' : '90vw',
+                  marginLeft: 'auto'
+                }}>
+                  <div className="mr-4">
+                    <ul className="flex flex-wrap" >
+                      {slots.map(slot => (
+                        <>
+                          {slot?.slotNumber <= 26 && (
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
+                              padding: '.4rem'
+                            }}>
+                              <span
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          )}
+                        </>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mr-4" style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                    <ul className="flex flex-wrap">
+                      {slots.map(slot => (
+                        <>
+                          {slot?.slotNumber > 26 && slot?.slotNumber <= 26 + 32 && (
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} key={slot.slotNumber} className="flex items-center mb-2" style={{
+                              padding: '.4rem'
+                            }}>
+                              <span
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          )}
+                        </>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="flex " style={{
+                  marginTop: window.innerWidth > 1067 ? '90px' : window.innerWidth > 850 ? '90px' : '55px',
+                  marginLeft: 'auto',
+                  width: window.innerWidth > 1067 ? '56vw' : window.innerWidth > 850 ? '69vw' : '82vw',
+                }}>
+
+                  <div className="mr-4" style={{
+                    width: '34vw',
+                    marginRight: '3vw'
+                  }}>
+                    <ul className="flex flex-wrap" >
+                      {slots.map(slot => (
+                        <>
+                          {slot?.slotNumber > (26 + 32) && slot?.slotNumber <= (26 + 32 + 22) && (
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
+                              padding: '.4rem'
+                            }}>
+                              <span
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          )}
+                        </>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div style={{
+                    width: '42vw',
+                    marginRight: '66px'
+                  }}>
+                    <ul className="flex flex-wrap" >
+                      {slots.map(slot => (
+                        <>
+                          {slot?.slotNumber > (26 + 32 + 22) && slot?.slotNumber <= (26 + 32 + 23 + 27) && (
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} key={slot.slotNumber} className="flex items-center mb-2" style={{
+                              padding: '.4rem'
+                            }}>
+                              <span
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          )}
+                        </>
+                      ))}
+                    </ul>
+                  </div>
+
+                </div>
+
+                <div className="flex " style={{
+                  marginTop: window.innerWidth > 1067 ? '90px' : window.innerWidth > 850 ? '90px' : '55px',
+                  marginLeft: 'auto',
+                  width: window.innerWidth > 1067 ? '52vw' : window.innerWidth > 850 ? '65vw' : '79vw',
+                }}>
+
+                  <div className="mr-4" style={{
+                    width: '32vw',
+                    marginRight: '3vw'
+                  }}>
+                    <ul className="flex flex-wrap" >
+                      {slots.map(slot => (
+                        <>
+                          {slot?.slotNumber > (108) && slot?.slotNumber <= (108 + 18) && (
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
+                              padding: '.4rem'
+                            }}>
+                              <span
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          )}
+                        </>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div style={{
+                    width: '50vw',
+                    marginRight: '52px'
+                  }}>
+                    <ul className="flex flex-wrap" >
+                      {slots.map(slot => (
+                        <>
+                          {slot?.slotNumber > (126) && slot?.slotNumber <= (126 + 28) && (
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} key={slot.slotNumber} className="flex items-center mb-2" style={{
+                              padding: '.4rem'
+                            }}>
+                              <span
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          )}
+                        </>
+                      ))}
+                    </ul>
+                  </div>
+
+                </div>
+
+                <div className="flex " style={{
+                  marginTop: window.innerWidth > 1067 ? '98px' : window.innerWidth > 850 ? '90px' : '55px',
+                  marginLeft: 'auto',
+                  width: window.innerWidth > 1067 ? '49vw' : window.innerWidth > 850 ? '60vw' : '72vw',
+                }}>
+
+                  <div className="mr-4" style={{
+                    width: '23vw',
+                    marginRight: '3vw'
+                  }}>
+                    <ul className="flex flex-wrap" >
+                      {slots.map(slot => (
+                        <>
+                          {slot?.slotNumber > (154) && slot?.slotNumber <= (154 + 14) && (
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
+                              padding: '.4rem'
+                            }}>
+                              <span
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          )}
+                        </>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div style={{
+                    width: '38vw',
+                    marginRight: '86px'
+                  }}>
+                    <ul className="flex flex-wrap" >
+                      {slots.map(slot => (
+                        <>
+                          {slot?.slotNumber > (168) && slot?.slotNumber <= (168 + 22) && (
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} key={slot.slotNumber} className="flex items-center mb-2" style={{
+                              padding: '.4rem'
+                            }}>
+                              <span
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          )}
+                        </>
+                      ))}
+                    </ul>
+                  </div>
+
+                </div>
+
+              </div> :
+
+              <div className="flex flex-wrap" style={{
+                marginTop: '5px',
+                width: '98vw',
+                marginLeft: '20px',
+                position: 'absolute',
+                top: 0
               }}>
-
-                <div className="mr-4">
-                  <ul className="flex flex-wrap" >
-                    {slots.map(slot => (
-                      <>
-                        {slot?.slotNumber <= 26 && (
-                          <li onClick={() => {
-                            if (slot?.booked) {
-                              setupdateModalData(slot)
-                              setIsOpen(true)
-                            }
-                            else {
-                              setSlotNumber(slot?.slotNumber)
-                              setOpen(true)
-                            }
-                          }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
-                            padding: '.4rem'
+                <div className="flex items-center mb-2 flex-wrap mt-8">
+                  {slots.map(slot => (
+                    <>
+                      {slot?.slotNumber <= 26 && (
+                        <div key={slot.slotNumber} className="mr-3">
+                          <ul className="flex" style={{
+                            flexWrap: 'wrap',
+                            padding: '.2rem'
                           }}>
-                            {/* {
-                              slot.booked ? 
-                              getTimePeriodDifference(slot?.dateOfParking,slot?.endDateOfParking)
-                              :null
-                            } */}
-                            <span
-                              className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          </li>
-                        )}
-                      </>
-                    ))}
-                  </ul>
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} className="flex items-center mb-2">
+                              <span
+                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ))}
+                </div>
+                <div className="flex items-center mb-2 flex-wrap" style={{ marginTop: '90px', marginLeft: '55px', width: '80vw' }}>
+                  {slots.map(slot => (
+                    <>
+                      {slot?.slotNumber > 26 && slot?.slotNumber <= 26 + 20 && (
+                        <div key={slot.slotNumber} className="mr-3" style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                          <ul className="flex" style={{
+                            flexWrap: 'wrap',
+                            padding: '.2rem'
+                          }}>
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} className="flex items-center mb-2">
+                              <span
+                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ))}
                 </div>
 
-                <div className="mr-4" style={{ marginLeft: '30px' }}>
-                  <ul className="flex flex-wrap" >
-                    {slots.map(slot => (
-                      <>
-                        {slot?.slotNumber > 26 && slot?.slotNumber <= 26 + 32 && (
-                          <li onClick={() => {
-                            if (slot?.booked) {
-                              setupdateModalData(slot)
-                              setIsOpen(true)
-                            }
-                            else {
-                              setSlotNumber(slot?.slotNumber)
-                              setOpen(true)
-                            }
-                          }} key={slot.slotNumber} className="flex items-center mb-2" style={{
-                            padding: '.4rem'
+
+                <div className="flex items-center mb-2 flex-wrap" style={{ marginTop: '105px', marginLeft: '96px', width: '70vw' }}>
+                  {slots.map(slot => (
+                    <>
+                      {slot?.slotNumber > 46 && slot?.slotNumber <= 46 + 18 && (
+                        <div key={slot.slotNumber} className="mr-3" style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                          <ul className="flex" style={{
+                            flexWrap: 'wrap',
+                            padding: '.2rem'
                           }}>
-                            <span
-                              className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          </li>
-                        )}
-                      </>
-                    ))}
-                  </ul>
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} className="flex items-center mb-2">
+                              <span
+                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ))}
                 </div>
 
+
+                <div className="flex items-center mb-2 flex-wrap" style={{ marginTop: '100px', marginLeft: '146px', width: '52vw' }}>
+                  {slots.map(slot => (
+                    <>
+                      {slot?.slotNumber > 64 && slot?.slotNumber <= 64 + 14 && (
+                        <div key={slot.slotNumber} className="mr-3" style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                          <ul className="flex" style={{
+                            flexWrap: 'wrap',
+                            padding: '.2rem'
+                          }}>
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} className="flex items-center mb-2">
+                              <span
+                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ))}
+                </div>
+
+
+                <div className="flex items-center mb-2 flex-wrap" style={{ marginTop: '20px', marginRight: '40px', width: '90vw' }}>
+                  {slots.map(slot => (
+                    <>
+                      {slot?.slotNumber > 78 && slot?.slotNumber <= 64 + 36 && (
+                        <div key={slot.slotNumber} className="mr-3" style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                          <ul className="flex" style={{
+                            flexWrap: 'wrap',
+                            padding: '.2rem'
+                          }}>
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} className="flex items-center mb-2">
+                              <span
+                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ))}
+                </div>
+
+
+                <div className="flex items-center mb-2 flex-wrap" style={{ marginTop: '58px', marginRight: '40px', width: '78vw' }}>
+                  {slots.map(slot => (
+                    <>
+                      {slot?.slotNumber > 100 && slot?.slotNumber <= 100 + 22 && (
+                        <div key={slot.slotNumber}  style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                          <ul className="flex" style={{
+                            flexWrap: 'wrap',
+                            padding: '.2rem',
+                            marginRight:'.65rem'
+                          }}>
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} className="flex items-center mb-2">
+                              <span
+                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ))}
+                </div>
+
+                <div className="flex items-center mb-2 flex-wrap" style={{ marginTop: '68px', marginRight: '40px', width: '78vw' }}>
+                  {slots.map(slot => (
+                    <>
+                      {slot?.slotNumber > 122 && slot?.slotNumber <= 122 + 22 && (
+                        <div key={slot.slotNumber}  style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                          <ul className="flex" style={{
+                            flexWrap: 'wrap',
+                            padding: '.2rem',
+                            marginRight:'.65rem'
+                          }}>
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} className="flex items-center mb-2">
+                              <span
+                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ))}
+                </div>
+
+                <div className="flex items-center mb-2 flex-wrap" style={{ marginTop: '68px', marginRight: '40px', width: '76vw' }}>
+                  {slots.map(slot => (
+                    <>
+                      {slot?.slotNumber > 144 && slot?.slotNumber <= 144 + 24 && (
+                        <div key={slot.slotNumber}  style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                          <ul className="flex" style={{
+                            flexWrap: 'wrap',
+                            padding: '.2rem',
+                            marginRight:'.45rem'
+                          }}>
+                            <li onClick={() => {
+                              if (slot?.booked) {
+                                setupdateModalData(slot)
+                                setIsOpen(true)
+                              }
+                              else {
+                                setSlotNumber(slot?.slotNumber)
+                                setOpen(true)
+                              }
+                            }} className="flex items-center mb-2">
+                              <span
+                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                  }`}
+                                title={slot.booked ? `${getTimePeriodDifference(
+                                  slot?.dateOfParking,
+                                  slot?.endDateOfParking
+                                )} Hours` : null}
+                              />
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ))}
+                </div>
+                 
               </div>
 
-              <div className="flex " style={{
-                marginTop: '90px',
-                marginLeft: 'auto',
-                width: '56vw'
-              }}>
 
-                <div className="mr-4" style={{
-                  width: '34vw',
-                  marginRight: '3vw'
-                }}>
-                  <ul className="flex flex-wrap" >
-                    {slots.map(slot => (
-                      <>
-                        {slot?.slotNumber > (26 + 32) && slot?.slotNumber <= (26 + 32 + 22) && (
-                          <li onClick={() => {
-                            if (slot?.booked) {
-                              setupdateModalData(slot)
-                              setIsOpen(true)
-                            }
-                            else {
-                              setSlotNumber(slot?.slotNumber)
-                              setOpen(true)
-                            }
-                          }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
-                            padding: '.4rem'
-                          }}>
-                            <span
-                              className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          </li>
-                        )}
-                      </>
-                    ))}
-                  </ul>
-                </div>
-
-                <div style={{
-                  width: '42vw',
-                  marginRight: '66px'
-                }}>
-                  <ul className="flex flex-wrap" >
-                    {slots.map(slot => (
-                      <>
-                        {slot?.slotNumber > (26 + 32 + 22) && slot?.slotNumber <= (26 + 32 + 23 + 27) && (
-                          <li onClick={() => {
-                            if (slot?.booked) {
-                              setupdateModalData(slot)
-                              setIsOpen(true)
-                            }
-                            else {
-                              setSlotNumber(slot?.slotNumber)
-                              setOpen(true)
-                            }
-                          }} key={slot.slotNumber} className="flex items-center mb-2" style={{
-                            padding: '.4rem'
-                          }}>
-                            <span
-                              className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          </li>
-                        )}
-                      </>
-                    ))}
-                  </ul>
-                </div>
-
-              </div>
+            }
 
 
-              <div className="flex " style={{
-                marginTop: '90px',
-                marginLeft: 'auto',
-                width: '52vw'
-              }}>
-
-                <div className="mr-4" style={{
-                  width: '32vw',
-                  marginRight: '3vw'
-                }}>
-                  <ul className="flex flex-wrap" >
-                    {slots.map(slot => (
-                      <>
-                        {slot?.slotNumber > (108) && slot?.slotNumber <= (108 + 18) && (
-                          <li onClick={() => {
-                            if (slot?.booked) {
-                              setupdateModalData(slot)
-                              setIsOpen(true)
-                            }
-                            else {
-                              setSlotNumber(slot?.slotNumber)
-                              setOpen(true)
-                            }
-                          }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
-                            padding: '.4rem'
-                          }}>
-                            <span
-                              className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          </li>
-                        )}
-                      </>
-                    ))}
-                  </ul>
-                </div>
-
-                <div style={{
-                  width: '50vw',
-                  marginRight: '52px'
-                }}>
-                  <ul className="flex flex-wrap" >
-                    {slots.map(slot => (
-                      <>
-                        {slot?.slotNumber > (126) && slot?.slotNumber <= (126 + 28) && (
-                          <li onClick={() => {
-                            if (slot?.booked) {
-                              setupdateModalData(slot)
-                              setIsOpen(true)
-                            }
-                            else {
-                              setSlotNumber(slot?.slotNumber)
-                              setOpen(true)
-                            }
-                          }} key={slot.slotNumber} className="flex items-center mb-2" style={{
-                            padding: '.4rem'
-                          }}>
-                            <span
-                              className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          </li>
-                        )}
-                      </>
-                    ))}
-                  </ul>
-                </div>
-
-              </div>
-
-
-              <div className="flex " style={{
-                marginTop: '98px',
-                marginLeft: 'auto',
-                width: '49vw'
-              }}>
-
-                <div className="mr-4" style={{
-                  width: '23vw',
-                  marginRight: '3vw'
-                }}>
-                  <ul className="flex flex-wrap" >
-                    {slots.map(slot => (
-                      <>
-                        {slot?.slotNumber > (154) && slot?.slotNumber <= (154 + 14) && (
-                          <li onClick={() => {
-                            if (slot?.booked) {
-                              setupdateModalData(slot)
-                              setIsOpen(true)
-                            }
-                            else {
-                              setSlotNumber(slot?.slotNumber)
-                              setOpen(true)
-                            }
-                          }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
-                            padding: '.4rem'
-                          }}>
-                            <span
-                              className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          </li>
-                        )}
-                      </>
-                    ))}
-                  </ul>
-                </div>
-
-                <div style={{
-                  width: '38vw',
-                  marginRight: '86px'
-                }}>
-                  <ul className="flex flex-wrap" >
-                    {slots.map(slot => (
-                      <>
-                        {slot?.slotNumber > (168) && slot?.slotNumber <= (168 + 22) && (
-                          <li onClick={() => {
-                            if (slot?.booked) {
-                              setupdateModalData(slot)
-                              setIsOpen(true)
-                            }
-                            else {
-                              setSlotNumber(slot?.slotNumber)
-                              setOpen(true)
-                            }
-                          }} key={slot.slotNumber} className="flex items-center mb-2" style={{
-                            padding: '.4rem'
-                          }}>
-                            <span
-                              className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
-                                }`}
-                            />
-                          </li>
-                        )}
-                      </>
-                    ))}
-                  </ul>
-                </div>
-
-              </div>
-
-            </div>
           </div>
 
 
@@ -665,7 +1019,7 @@ function HomePage() {
               }) : ''}
             </p>
             <p className="text-gray-600 mb-2">
-              <span className="font-semibold">Parking Hours:</span> {getTimePeriodDifference(formData?.dateOfParking,formData?.endDateOfParking)}
+              <span className="font-semibold">Parking Hours:</span> {getTimePeriodDifference(formData?.dateOfParking, formData?.endDateOfParking)}
             </p>
             <p className="text-gray-600 mb-2">
               <span className="font-semibold">Vehicle No:</span> {formData.vehicleNo}
