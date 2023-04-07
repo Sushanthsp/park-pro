@@ -65,3 +65,16 @@ export const getSlots = (params) => {
       });
   });
 };
+
+export const deleteSlots = (id) => {
+  return new Promise(async (resolve, reject) => {
+    await request
+      .delete("/user/book/bookslot/"+id)
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((e) => {
+        resolve(e.response.data);
+      });
+  });
+};
