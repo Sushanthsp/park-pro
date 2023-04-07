@@ -4,7 +4,7 @@ import request from "./request";
 export const login = (data) => {
   return new Promise(async (resolve, reject) => {
     await request
-      .post("/auth/login", data)
+      .post("/user/login", data)
       .then((res) => {
         resolve(res.data);
       })
@@ -16,7 +16,47 @@ export const login = (data) => {
 export const register = (data) => {
   return new Promise(async (resolve, reject) => {
     await request
-      .post("/auth/register", data)
+      .post("/user/register", data)
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((e) => {
+        resolve(e.response.data);
+      });
+  });
+};
+
+export const verifyOtp = (data) => {
+  return new Promise(async (resolve, reject) => {
+    await request
+      .post("/user/verify-otp", data)
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((e) => {
+        resolve(e.response.data);
+      });
+  });
+};
+
+export const bookSlot = (data) => {
+  return new Promise(async (resolve, reject) => {
+    await request
+      .post("/user/book/bookslot", data)
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((e) => {
+        resolve(e.response.data);
+      });
+  });
+};
+
+export const getSlots = (params) => {
+  console.log("params",params)
+  return new Promise(async (resolve, reject) => {
+    await request
+      .get("/user/book/bookslot", {params})
       .then((res) => {
         resolve(res.data);
       })

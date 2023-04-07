@@ -12,12 +12,14 @@ function App() {
   return (
     <Provider store={store}>
       <div className="App">
-        <Router>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
-        </Router>
+       
+            <Router>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<Login />} />
+              </Routes>
+            </Router>
+         
       </div>
     </Provider>
   );
