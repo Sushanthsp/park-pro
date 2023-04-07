@@ -207,8 +207,21 @@ function HomePage() {
     setIsOpen(false);
   };
 
-
-
+  function getTimePeriodDifference(startTimePeriod, endTimePeriod) {
+    // Calculate the time period difference in milliseconds
+    const timePeriodDifferenceMs = new Date(endTimePeriod) - new Date(startTimePeriod);
+    console.log("timePeriodDifferenceMs",timePeriodDifferenceMs,startTimePeriod, endTimePeriod)
+    // Convert time period difference from milliseconds to hours and minutes
+    const timePeriodDifferenceHrs = Math.floor(timePeriodDifferenceMs / (1000 * 60 * 60));
+    const timePeriodDifferenceMin = Math.floor((timePeriodDifferenceMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+    // Format time period difference as hh:mm
+    const formattedTimePeriodDifference = `${timePeriodDifferenceHrs.toString().padStart(2, '0')}:${timePeriodDifferenceMin.toString().padStart(2, '0')}`;
+  
+    return formattedTimePeriodDifference;
+  }
+  
+  
   return (
     <>
       {showToast && (
@@ -273,6 +286,11 @@ function HomePage() {
                           }} key={slot.slotNumber} className="flex  items-center mb-2" style={{
                             padding: '.4rem'
                           }}>
+                            {/* {
+                              slot.booked ? 
+                              getTimePeriodDifference(slot?.dateOfParking,slot?.endDateOfParking)
+                              :null
+                            } */}
                             <span
                               className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
                                 }`}
@@ -645,6 +663,9 @@ function HomePage() {
                 hour: 'numeric',
                 minute: 'numeric',
               }) : ''}
+            </p>
+            <p className="text-gray-600 mb-2">
+              <span className="font-semibold">Parking Hours:</span> {getTimePeriodDifference(formData?.dateOfParking,formData?.endDateOfParking)}
             </p>
             <p className="text-gray-600 mb-2">
               <span className="font-semibold">Vehicle No:</span> {formData.vehicleNo}
