@@ -165,6 +165,7 @@ function HomePage() {
   };
 
   const deleteSlotsFun = (id) => {
+    setLoading(true)
     deleteSlots(id).then(res => {
       if (res?.status) {
         handleShowToast('success', res?.message)
@@ -315,35 +316,6 @@ function HomePage() {
       </header>
 
       <div class="sm:h-screen h:5 flex flex-col sm:justify-center sm:items-center mt-2">
-        {/* <div className="flex sm:justify-center sm:items-center sm:h-full h-20 ">
-          <div class="w-full md:w-96 flex justify-center items-center mb-2 md:mb-0 md:mr-4">
-            <DatePicker
-              selected={startDate}
-              onChange={(dates) => {
-                const [start, end] = dates;
-                setStartDate(start);
-                setEndDate(end);
-              }}
-              startDate={startDate}
-              endDate={endDate}
-              selectsRange
-              className="w-full border border-indigo-500 px-4 py-2 rounded-lg focus:outline-none focus:border-indigo-700"
-              placeholderText="Select Date Range"
-            />
-            <Button onClick={() => {
-              setStartDate(null)
-              setEndDate(null)
-              getSlotsFun()
-            }} variant="outlined" color="primary" className="border-primary text-primary hover:bg-primary hover:text-primary max-h-10"
-              style={{
-                marginLeft: '10px'
-              }}>
-
-              Clear
-            </Button>
-          </div>
-
-        </div> */}
 
         <div className="parking-lot-container w-90 h-90 element mt-5">
           <div className='relative'>
@@ -396,7 +368,7 @@ function HomePage() {
                               padding: '.4rem'
                             }}>
                               <span
-                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -428,7 +400,7 @@ function HomePage() {
                               padding: '.4rem'
                             }}>
                               <span
-                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -470,7 +442,7 @@ function HomePage() {
                               padding: '.4rem'
                             }}>
                               <span
-                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -505,7 +477,7 @@ function HomePage() {
                               padding: '.4rem'
                             }}>
                               <span
-                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -548,7 +520,7 @@ function HomePage() {
                               padding: '.4rem'
                             }}>
                               <span
-                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -583,7 +555,7 @@ function HomePage() {
                               padding: '.4rem'
                             }}>
                               <span
-                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -626,7 +598,7 @@ function HomePage() {
                               padding: '.4rem'
                             }}>
                               <span
-                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -661,7 +633,7 @@ function HomePage() {
                               padding: '.4rem'
                             }}>
                               <span
-                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-1 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -706,7 +678,7 @@ function HomePage() {
                               }
                             }} className="flex items-center mb-2">
                               <span
-                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -740,7 +712,7 @@ function HomePage() {
                               }
                             }} className="flex items-center mb-2">
                               <span
-                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -776,7 +748,7 @@ function HomePage() {
                               }
                             }} className="flex items-center mb-2">
                               <span
-                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -812,7 +784,7 @@ function HomePage() {
                               }
                             }} className="flex items-center mb-2">
                               <span
-                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -848,7 +820,7 @@ function HomePage() {
                               }
                             }} className="flex items-center mb-2">
                               <span
-                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-.6 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -885,7 +857,7 @@ function HomePage() {
                               }
                             }} className="flex items-center mb-2">
                               <span
-                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -921,7 +893,7 @@ function HomePage() {
                               }
                             }} className="flex items-center mb-2">
                               <span
-                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -957,7 +929,7 @@ function HomePage() {
                               }
                             }} className="flex items-center mb-2">
                               <span
-                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-green-500" : "bg-red-500"
+                                className={`w-2 h-2 rounded-full mr-.5 cursor-pointer ${slot.booked ? "bg-red-500" : "bg-green-500"
                                   }`}
                                 title={slot.booked ? `${getTimePeriodDifference(
                                   slot?.dateOfParking,
@@ -1056,7 +1028,7 @@ function HomePage() {
               <Button variant="outlined" color="primary" onClick={handleClose} className="mr-2">
                 Cancel
               </Button>
-              <Button disabled={loading ? true : false} variant="contained" color="primary" onClick={handleSubmit} style={{ marginLeft: '5px' }} className="ml-2">
+              <Button variant="contained" color="primary" onClick={loading ? null : handleSubmit} style={{ marginLeft: '5px' }} className="ml-2">
                 {loading ? "Loading..." : "save"}
               </Button>
             </div>
@@ -1108,8 +1080,8 @@ function HomePage() {
             </p>
           </div>
           <div className="flex justify-end mt-10">
-            {formData?.user === user?.userData?._id ? <Button variant="contained" color="primary" onClick={() => deleteSlotsFun(formData?._id)} className="mt-4">
-              Cancel booking
+            {formData?.user === user?.userData?._id ? <Button variant="contained" color="primary" onClick={() => loading ? null : deleteSlotsFun(formData?._id)} className="mt-4 bg-primary">
+              {loading ? "Loading..." : "Cancel booking" }
             </Button> : null}
             <Button style={{ marginLeft: '5px' }} variant="contained" color="primary" onClick={handleModalClose} className="mt-4">
               Close
