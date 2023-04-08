@@ -264,6 +264,7 @@ function HomePage() {
                   setStartDate(start);
                   setEndDate(end);
                 }}
+                minDate={new Date()}
                 startDate={startDate}
                 endDate={endDate}
                 selectsRange
@@ -1036,7 +1037,7 @@ function HomePage() {
               inputProps={{
                 placeholder: 'dd/mm/yyyy hh:mm',
                 min: dateOfParking ? moment(dateOfParking).add(10, 'minutes').isSameOrBefore(moment(), 'day')
-                  : moment().subtract(10, 'minutes').format('YYYY-MM-DDTHH:mm')
+                  : moment().add(10, 'minutes').format('YYYY-MM-DDTHH:mm')
               }}
               min={new Date().toISOString().split('.')[0]}
             />
