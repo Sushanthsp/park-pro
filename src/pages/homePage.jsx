@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { bookSlot, getSlots, deleteSlots } from '../service/api'
-import './style.css'
+import '../styles/home.css'
 import { Modal, TextField, MenuItem, Button, Grid } from '@material-ui/core';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import actions from '../redux/user/actions';
 import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 const Toast = ({ type, message, onClose }) => {
   let bgColor = '';
@@ -33,6 +35,9 @@ function HomePage() {
 
   const { loggedIn, user } = useSelector(state => state.user)
   const navigate = useNavigate()
+
+  const dispatch = useDispatch()
+
   useEffect(() => {
     if (!loggedIn) {
       navigate('/login')
@@ -229,13 +234,88 @@ function HomePage() {
     setDatePickerVisible(!datepickerVisible); // Toggle datepicker visibility on click
   }
 
+  const logout = () => {
+    navigate('/')
+    dispatch(actions.setLoggedIn(false))
+    dispatch(actions.setUser(null))
+    dispatch(actions.setToken(null))
+  }
   return (
     <>
       {showToast && (
         <Toast type={showToast.type} message={showToast.message} onClose={() => setShowToast(null)} />
       )}
+      <header className="bg-indigo-700 py-4">
+        <nav className="flex items-center justify-between container mx-auto px-4">
+         {window?.innerWidth > 600 ? <div className="flex-2 justify-start">
+            <div className="items-center text-white uppercase font-bold text-xl flex">
+              PARK PLUS
+            </div>
+          </div> : null }
+
+          <div className="flex sm:justify-center sm:items-center sm:h-full h-20 ">
+            <div class="w-full md:w-96 flex justify-center items-center mb-2 md:mb-0 md:mr-4">
+              <DatePicker
+                selected={startDate}
+                onChange={(dates) => {
+                  const [start, end] = dates;
+                  setStartDate(start);
+                  setEndDate(end);
+                }}
+                startDate={startDate}
+                endDate={endDate}
+                selectsRange
+                className="w-full border border-indigo-500 px-4 py-2 rounded-lg focus:outline-none focus:border-indigo-700"
+                placeholderText="Select Date Range"
+              />
+              <Button onClick={() => {
+                setStartDate(null)
+                setEndDate(null)
+                getSlotsFun()
+              }}
+                variant="contained"
+                color="default"
+                className="bg-white text-indigo-500 hover:bg-white-500 hover:text-black max-h-10"
+                style={{
+                  marginLeft: '10px'
+                }}>
+
+                Clear
+              </Button>
+            </div>
+
+          </div>
+
+          <div>
+            <div className="mr-2 sm:hidden flex">
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={logout}
+                style={{
+                  marginLeft: '10px'
+                }}  
+              >
+                <ExitToAppIcon color='secondary' />
+              </Button>
+            </div>
+
+            <div className="mr-2 md:flex hidden">
+              <Button
+                onClick={logout}
+                variant="contained"
+                color="default"
+                className="bg-white text-indigo-500 hover:bg-white-500 hover:text-black max-h-10"
+              >
+                Logout
+              </Button>
+            </div>
+          </div>
+        </nav>
+      </header>
+
       <div class="sm:h-screen h:5 flex flex-col sm:justify-center sm:items-center mt-2">
-        <div className="flex sm:justify-center sm:items-center sm:h-full h-20 ">
+        {/* <div className="flex sm:justify-center sm:items-center sm:h-full h-20 ">
           <div class="w-full md:w-96 flex justify-center items-center mb-2 md:mb-0 md:mr-4">
             <DatePicker
               selected={startDate}
@@ -263,8 +343,7 @@ function HomePage() {
             </Button>
           </div>
 
-        </div>
-
+        </div> */}
 
         <div className="parking-lot-container w-90 h-90 element mt-5">
           <div className='relative'>
@@ -285,7 +364,7 @@ function HomePage() {
                   src={require('../assets/img2.png')}
                   alt="Parking Lot"
                   className="object-cover m-auto h-full w-90vw"
-                  style={{width:'90vw'}}
+                  style={{ width: '90vw' }}
                 />
               </div>
             }
@@ -789,11 +868,11 @@ function HomePage() {
                   {slots.map(slot => (
                     <>
                       {slot?.slotNumber > 100 && slot?.slotNumber <= 100 + 22 && (
-                        <div key={slot.slotNumber}  style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                        <div key={slot.slotNumber} style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
                           <ul className="flex" style={{
                             flexWrap: 'wrap',
                             padding: '.2rem',
-                            marginRight:'.65rem'
+                            marginRight: '.65rem'
                           }}>
                             <li onClick={() => {
                               if (slot?.booked) {
@@ -825,11 +904,11 @@ function HomePage() {
                   {slots.map(slot => (
                     <>
                       {slot?.slotNumber > 122 && slot?.slotNumber <= 122 + 22 && (
-                        <div key={slot.slotNumber}  style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                        <div key={slot.slotNumber} style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
                           <ul className="flex" style={{
                             flexWrap: 'wrap',
                             padding: '.2rem',
-                            marginRight:'.65rem'
+                            marginRight: '.65rem'
                           }}>
                             <li onClick={() => {
                               if (slot?.booked) {
@@ -861,11 +940,11 @@ function HomePage() {
                   {slots.map(slot => (
                     <>
                       {slot?.slotNumber > 144 && slot?.slotNumber <= 144 + 24 && (
-                        <div key={slot.slotNumber}  style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
+                        <div key={slot.slotNumber} style={{ marginLeft: window.innerWidth > 850 ? '30px' : '0' }}>
                           <ul className="flex" style={{
                             flexWrap: 'wrap',
                             padding: '.2rem',
-                            marginRight:'.45rem'
+                            marginRight: '.45rem'
                           }}>
                             <li onClick={() => {
                               if (slot?.booked) {
@@ -892,7 +971,7 @@ function HomePage() {
                     </>
                   ))}
                 </div>
-                 
+
               </div>
 
 
