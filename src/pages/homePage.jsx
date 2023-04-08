@@ -253,7 +253,7 @@ function HomePage() {
             <div className="items-center text-white uppercase font-bold text-xl md:flex hidden">
               PARK PLUS
             </div>
-          </div>  
+          </div>
 
           <div className="flex sm:justify-center sm:items-center sm:h-full h-20 ">
             <div class="w-full md:w-96 flex justify-center items-center mb-2 md:mb-0 md:mr-4">
@@ -296,7 +296,7 @@ function HomePage() {
                 onClick={logout}
                 style={{
                   marginLeft: '10px',
-                 }}  
+                }}
               >
                 <ExitToAppIcon color='secondary' />
               </Button>
@@ -989,11 +989,15 @@ function HomePage() {
               onChange={(e) => {
                 const selectedDate = new Date(e.target.value);
                 const currentDate = new Date();
-                if (selectedDate < currentDate) { 
-                  setDateOfParking('');
-                }
+                const minDate = moment().add(5, 'minutes').toDate();
 
-                setDateOfParking(e.target.value)}}
+                if (selectedDate < currentDate || selectedDate < minDate) {
+                  handleShowToast('error', 'Minimum time should be 5 minutes from now');
+                  setDateOfParking('');
+                } else {
+                  setDateOfParking(e.target.value);
+                }
+              }}
               fullWidth
               variant="outlined"
               className="mb-4"
@@ -1001,9 +1005,10 @@ function HomePage() {
               InputLabelProps={{ shrink: true }}
               inputProps={{
                 placeholder: 'dd/mm/yyyy hh:mm',
-                min: moment().subtract(30, 'minutes').format('YYYY-MM-DDTHH:mm'),
+                min: moment().add(5, 'minutes').format('YYYY-MM-DDTHH:mm'),
+                minTime: moment().add(5, 'minutes').format('YYYY-MM-DDTHH:mm'),
               }}
-             />
+            />
             <TextField
               label="End Date of Parking"
               type="datetime-local"
@@ -1011,10 +1016,18 @@ function HomePage() {
               onChange={(e) => {
                 const selectedDate = new Date(e.target.value);
                 const currentDate = new Date();
-                if (selectedDate < currentDate) { 
+                const minDate = moment(dateOfParking).add(10, 'minutes').toDate();
+            
+                if (!dateOfParking) {
+                  handleShowToast('error', 'Please select Date of Parking first');
                   setEndDateOfParking('');
+                } else if (selectedDate < currentDate || selectedDate < minDate) {
+                  handleShowToast('error', 'Minimum parking time should be 10 minutes from Date of Parking');
+                  setEndDateOfParking('');
+                } else {
+                  setEndDateOfParking(e.target.value);
                 }
-                setEndDateOfParking(e.target.value)}}
+              }}
               fullWidth
               variant="outlined"
               className="mb-4"
@@ -1022,10 +1035,10 @@ function HomePage() {
               InputLabelProps={{ shrink: true }}
               inputProps={{
                 placeholder: 'dd/mm/yyyy hh:mm',
-                min:dateOfParking ?  moment(dateOfParking).add(30, 'minutes').isSameOrBefore(moment(), 'day') 
-                :  moment().subtract(30, 'minutes').format('YYYY-MM-DDTHH:mm')
+                min: dateOfParking ? moment(dateOfParking).add(10, 'minutes').isSameOrBefore(moment(), 'day')
+                  : moment().subtract(10, 'minutes').format('YYYY-MM-DDTHH:mm')
               }}
-              min={new Date().toISOString().split('.')[0]} 
+              min={new Date().toISOString().split('.')[0]}
             />
             <TextField
               label="Vehicle No"
@@ -1103,7 +1116,7 @@ function HomePage() {
           </div>
           <div className="flex justify-end mt-10">
             {formData?.user === user?.userData?._id ? <Button variant="contained" color="primary" onClick={() => loading ? null : deleteSlotsFun(formData?._id)} className="mt-4 bg-primary">
-              {loading ? "Loading..." : "Cancel booking" }
+              {loading ? "Loading..." : "Cancel booking"}
             </Button> : null}
             <Button style={{ marginLeft: '5px' }} variant="contained" color="primary" onClick={handleModalClose} className="mt-4">
               Close
