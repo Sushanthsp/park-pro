@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import moment from 'moment';
 
 const Toast = ({ type, message, onClose }) => {
   let bgColor = '';
@@ -985,25 +986,46 @@ function HomePage() {
               label="Date of Parking"
               type="datetime-local"
               value={dateOfParking}
-              onChange={(e) => setDateOfParking(e.target.value)}
+              onChange={(e) => {
+                const selectedDate = new Date(e.target.value);
+                const currentDate = new Date();
+                if (selectedDate < currentDate) { 
+                  setDateOfParking('');
+                }
+
+                setDateOfParking(e.target.value)}}
               fullWidth
               variant="outlined"
               className="mb-4"
               margin="normal"
               InputLabelProps={{ shrink: true }}
-              inputProps={{ placeholder: 'dd/mm/yyyy hh:mm' }}
-            />
+              inputProps={{
+                placeholder: 'dd/mm/yyyy hh:mm',
+                min: moment().subtract(30, 'minutes').format('YYYY-MM-DDTHH:mm'),
+              }}
+             />
             <TextField
               label="End Date of Parking"
               type="datetime-local"
               value={endDateOfParking}
-              onChange={(e) => setEndDateOfParking(e.target.value)}
+              onChange={(e) => {
+                const selectedDate = new Date(e.target.value);
+                const currentDate = new Date();
+                if (selectedDate < currentDate) { 
+                  setEndDateOfParking('');
+                }
+                setEndDateOfParking(e.target.value)}}
               fullWidth
               variant="outlined"
               className="mb-4"
               margin="normal"
               InputLabelProps={{ shrink: true }}
-              inputProps={{ placeholder: 'dd/mm/yyyy hh:mm' }}
+              inputProps={{
+                placeholder: 'dd/mm/yyyy hh:mm',
+                min:dateOfParking ?  moment(dateOfParking).add(30, 'minutes').isSameOrBefore(moment(), 'day') 
+                :  moment().subtract(30, 'minutes').format('YYYY-MM-DDTHH:mm')
+              }}
+              min={new Date().toISOString().split('.')[0]} 
             />
             <TextField
               label="Vehicle No"
