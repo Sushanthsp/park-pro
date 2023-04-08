@@ -245,13 +245,13 @@ function HomePage() {
       {showToast && (
         <Toast type={showToast.type} message={showToast.message} onClose={() => setShowToast(null)} />
       )}
-      <header className="bg-indigo-700 py-4">
+      <header className="bg-indigo-700 md:py-4 py-2">
         <nav className="flex items-center justify-between container mx-auto px-4">
-         {window?.innerWidth > 600 ? <div className="flex-2 justify-start">
-            <div className="items-center text-white uppercase font-bold text-xl flex">
+          <div className="flex-2 justify-start">
+            <div className="items-center text-white uppercase font-bold text-xl md:flex hidden">
               PARK PLUS
             </div>
-          </div> : null }
+          </div>  
 
           <div className="flex sm:justify-center sm:items-center sm:h-full h-20 ">
             <div class="w-full md:w-96 flex justify-center items-center mb-2 md:mb-0 md:mr-4">
@@ -287,14 +287,14 @@ function HomePage() {
           </div>
 
           <div>
-            <div className="mr-2 sm:hidden flex">
+            <div className="mr-2 mb-2 sm:hidden flex">
               <Button
                 variant="outlined"
                 color="secondary"
                 onClick={logout}
                 style={{
-                  marginLeft: '10px'
-                }}  
+                  marginLeft: '10px',
+                 }}  
               >
                 <ExitToAppIcon color='secondary' />
               </Button>
